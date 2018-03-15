@@ -9,46 +9,69 @@
 </head>
 
 <body>
-    <canvas id="gameWarp" width="200" height="200" style="border:1px solid #d3d3d3;"></canvas>
+    <center>
+        <canvas id="game" width="400" height="400" style="border:1px solid #d3d3d3;"></canvas>
+    </center>
     <script type="text/javascript">
-        const blockUnitWidth = 20
-        const blockUnitHeigh = 20
-        let gameWarp = document.getElementById("gameWarp")
-        const context = gameWarp.getContext('2d')
+        const blockUnitWidth = 40
+        const blockUnitHeigh = 40
+        let game = document.getElementById("game")
+        const context = game.getContext('2d')
         // 绘制矩形，参数为 左上角的 x , y 坐标，矩形的宽度和长度
         let blocks = []
         for (let x = 0; x <= 9; x++) {
             blocks[x] = []
             for (let y = 0; y <= 9; y++) {
-                blocks[x][y] = { 'x': x * blockUnitWidth, 'y': y * blockUnitHeigh }
-                context.strokeRect(x * blockUnitWidth, y * blockUnitHeigh, blockUnitWidth, blockUnitHeigh)
+                let offsetX = x * blockUnitWidth
+                let offsetY = y * blockUnitHeigh
+                blocks[x][y] = new Block(offsetX, offsetY)
+                context.strokeRect(offsetX, offsetY, blockUnitWidth, blockUnitHeigh)
             }
         }
+        function start(){
+            
+        }
+
         gameWarp.addEventListener('click', function (e) {
+            let block = getHandleBlock(e)
+            block.showStrInCenter(2)
+        })
+
+        gameWarp.addEventListener('contextmenu', function (e) {
+            console.log(e)
+            e.preventDefault()
+            let block = getHandleBlock(e)
+            block.showStrInCenter('?')
+        })
+
+
+        function Block(offsetX, offsetY) {
+            this.offsetX = offsetX
+            this.offsetY = offsetY
+            this.hasMine = false
+        }
+
+        /**
+         * 在小方块中心填充数字
+         */
+        Block.prototype.showStrInCenter = function (str) {
+            context.font = '20px Arial'
+            context.textAlign = 'center'
+            context.textBaseline = "middle";
+            // context.strokeRect(block['x'], block['y'], blockUnitWidth, blockUnitHeigh)
+            context.fillText(str, this.offsetX + blockUnitWidth / 2, this.offsetY + blockUnitHeigh / 2)
+        }
+
+        function getHandleBlock(e) {
             // 计算点击位置在 canvas 画布中的坐标
             let offsetX = e.pageX - gameWarp.offsetLeft
             let offsetY = e.pageY - gameWarp.offsetTop
             console.log(offsetX)
             console.log(offsetY)
-            // 计算所点击方块的坐标
+            // 计算所点击方块的坐标,整除
             let x = Math.floor(offsetX / blockUnitWidth)
             let y = Math.floor(offsetY / blockUnitHeigh)
-            let block = blocks[x][y]
-            console.log(blocks[x][y])
-            // context.fillStyle = 'red'
-            // context.fillRect(block['x'], block['y'], blockUnitWidth, blockUnitHeigh)
-            fillNumIntoBlcokCenter(2, block)
-        })
-
-        /**
-        * 在小方块中心填充数字
-        */
-        function fillNumIntoBlcokCenter(num, block) {
-            context.font = '20px'
-            context.textAlign = 'center'
-            context.textBaseline = "middle";
-            // context.strokeRect(block['x'], block['y'], blockUnitWidth, blockUnitHeigh)
-            context.fillText(num, block['x'] + blockUnitWidth / 2, block['y'] + blockUnitHeigh / 2)
+            return blocks[x][y]
         }
     </script>
 </body>
